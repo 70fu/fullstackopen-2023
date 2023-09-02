@@ -1,0 +1,33 @@
+html{
+    font-size: 10px;
+    font-family: 'Caveat';
+    background-color: #b007ff;
+}
+
+body{
+    width:600px;
+    margin: 10px auto;
+    background-color:#e5fe02;
+    padding: 0 20px 20px 20px;
+    border: 5px solid black;
+}
+
+img{
+    display: block;
+    margin: 0 auto;
+    width: 320px;
+}
+
+h1{
+    font-size: 60px;
+    text-align: center;
+    margin: 0;
+    padding: 20px 0;
+    color: #e63030;
+    text-shadow: 10px 10px 4px black;
+}
+
+p,li{
+    font-size:24px;
+    letter-spacing:1px;
+}
