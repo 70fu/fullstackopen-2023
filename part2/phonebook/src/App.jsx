@@ -21,12 +21,18 @@ const App = () => {
 
   const addPerson = (event) =>{
     event.preventDefault();
+    const trimmedName = newName.trim();
 
-    if(newName.trim().length==0)
+    if(trimmedName.length==0){
       return;
+    }
+    if(persons.findIndex((person)=>person.name===trimmedName)>-1){
+      alert(`${trimmedName} has already been added to the phonebook`);
+      return;
+    }
 
     const newPerson = {
-      name:newName
+      name:trimmedName
     }
     setPersons(persons.concat(newPerson));
     setNewName('');
