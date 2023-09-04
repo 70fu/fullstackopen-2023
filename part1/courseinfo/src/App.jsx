@@ -1,14 +1,5 @@
 import Course from './components/Course'
 
-/*const Total = (props) => {
-  const totalSum = props.course.parts.reduce((sum,current)=>current.exercises+sum,0);
-  return (
-    <>
-      <p>Number of exercises {totalSum}</p>
-    </>
-  )
-}*/
-
 const App = () => {
   const course = {
     id: 1,
