@@ -105,8 +105,16 @@ const App = () => {
   }
 
   const addPerson = (newName, newNumber) => {
-    if (persons.findIndex((person) => person.name === newName) > -1) {
-      alert(`${trimmedName} has already been added to the phonebook`);
+    const existingPerson = persons.find((person) => person.name === newName)
+    if (existingPerson !== undefined) {
+      if(window.confirm(`${newName} has already been added to the phonebook, replace the old number with a new one?`)){
+        personService.update(existingPerson.id,{...existingPerson,name:newName,number:newNumber})
+        .then(updatedPerson =>{
+          console.log('person updated');
+          setPersons(persons.map((p)=>p.id!==updatedPerson.id?p:updatedPerson));
+        })
+        return true;
+      }
       return false;
     }
 
