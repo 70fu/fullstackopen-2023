@@ -1,6 +1,18 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
+const Notification = ({ message, typeClass}) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className={`notification ${typeClass}`}>
+      {message}
+    </div>
+  )
+}
+
 const Filter = ({ filter, onChange }) => {
   return (
     <div>
@@ -74,8 +86,11 @@ const PersonList = ({ persons, filter, deletePerson }) => {
 }
 
 const App = () => {
+  const notificationTime = 5000;
   const [persons, setPersons] = useState([])
   const [filter, setFilter] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const personHook = ()=>{
     console.log('get persons');
@@ -92,6 +107,21 @@ const App = () => {
     setFilter(event.target.value);
   };
 
+  const showError = (errorText)=>{
+    console.log(errorText);
+    setErrorMessage(errorText);
+    setTimeout(()=>{
+      setErrorMessage(null)
+    }, notificationTime);
+  }
+  const showSuccess = (text)=>{
+    console.log(text);
+    setSuccessMessage(text);
+    setTimeout(()=>{
+      setSuccessMessage(null)
+    }, notificationTime);
+  }
+
   const deletePerson = (id)=>{
     console.log('delete person');
     const person = persons.find((p)=>p.id===id);
@@ -100,6 +130,7 @@ const App = () => {
         .then(()=>{
           console.log(`person ${id} deleted`);
           setPersons(persons.filter((p)=>p.id!==id));
+          showSuccess(`Removed ${person.name}`);
         })
     }
   }
@@ -112,6 +143,11 @@ const App = () => {
         .then(updatedPerson =>{
           console.log('person updated');
           setPersons(persons.map((p)=>p.id!==updatedPerson.id?p:updatedPerson));
+          showSuccess(`updated phone number of ${updatedPerson.name} to ${updatedPerson.number}`);
+        })
+        .catch((error)=>{
+          showError(`the person ${existingPerson.name} has already been removed from the server`);
+          setPersons(persons.filter((p)=>p.id!==existingPerson.id));
         })
         return true;
       }
@@ -128,6 +164,7 @@ const App = () => {
       .then(createdPerson => {
         console.log('created person ', createdPerson);
         setPersons(persons.concat(createdPerson));
+        showSuccess(`Added ${createdPerson.name}`);
       })
     return true;
   }
@@ -135,6 +172,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} typeClass="error"/>
+      <Notification message={successMessage} typeClass="success"/>
       <Filter filter={filter} onChange={handleFilterChange} />
 
       <h3>Add a new Person</h3>
