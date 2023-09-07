@@ -51,21 +51,23 @@ const PersonForm = ({ addPerson }) => {
   )
 }
 
-const Person = ({ person }) => {
+const Person = ({ person, handleDelete}) => {
   return (
     <>
       {person.name} {person.number}
+      <button onClick={handleDelete}>delete</button>
       <br />
     </>
   );
 }
 
-const PersonList = ({ persons, filter }) => {
+const PersonList = ({ persons, filter, deletePerson }) => {
+
   return (
     <div>
       {persons.filter((person) => filter.trim().length === 0 || person.name.toLowerCase().includes(filter.toLowerCase()))
         .map((person) =>
-          <Person key={person.id} person={person} />
+          <Person key={person.id} person={person} handleDelete={()=>deletePerson(person.id)} />
         )}
     </div>
   )
@@ -89,6 +91,18 @@ const App = () => {
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
+
+  const deletePerson = (id)=>{
+    console.log('delete person');
+    const person = persons.find((p)=>p.id===id);
+    if(window.confirm(`Delete person ${person.name}?`)) {
+      personService.deleteRes(id)
+        .then(()=>{
+          console.log(`person ${id} deleted`);
+          setPersons(persons.filter((p)=>p.id!==id));
+        })
+    }
+  }
 
   const addPerson = (newName, newNumber) => {
     if (persons.findIndex((person) => person.name === newName) > -1) {
@@ -119,7 +133,7 @@ const App = () => {
       <PersonForm addPerson={addPerson} />
 
       <h3>Numbers</h3>
-      <PersonList filter={filter} persons={persons} />
+      <PersonList filter={filter} persons={persons}  deletePerson={deletePerson}/>
     </div>
   )
 }
