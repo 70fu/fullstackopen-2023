@@ -1,2 +1,2 @@
 # fullstackopen-2023
-Full Stack Open 2023 Submission Repository
+Submission repository for the [fullstackopen-2023 course](https://fullstackopen.com/en/)
