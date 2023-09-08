@@ -19,7 +19,7 @@ const CountryDetails = ({countryData}) => {
   )
 }
 
-const Countries = ({filteredCountries, details})=>{
+const Countries = ({filteredCountries, details, setSearchText})=>{
   const maxCountries = 10;
 
   if(details === null){
@@ -34,6 +34,7 @@ const Countries = ({filteredCountries, details})=>{
           {filteredCountries.map((c)=>
             <div key={c.cca3}>
               {c.name.common}
+              <button onClick={()=>setSearchText(c.name.common)}>show</button>
               <br/>
             </div>
           )}
@@ -92,7 +93,7 @@ function App() {
   return (
     <>
       find countries <input value ={searchText} onChange={handleSearchChange}/>
-      <Countries filteredCountries={getFilteredCountries()} details={details}/>
+      <Countries filteredCountries={getFilteredCountries()} details={details} setSearchText={setSearchText}/>
     </>
   )
 }
