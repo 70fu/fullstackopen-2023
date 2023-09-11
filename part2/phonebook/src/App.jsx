@@ -166,6 +166,9 @@ const App = () => {
         setPersons(persons.concat(createdPerson));
         showSuccess(`Added ${createdPerson.name}`);
       })
+      .catch(error=>{
+        showError(error.response.data.error);
+      })
     return true;
   }
 
