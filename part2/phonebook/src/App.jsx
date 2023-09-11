@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import personService from './services/persons'
 
-const Notification = ({ message, typeClass}) => {
+const Notification = ({ message, typeClass }) => {
   if (message === null) {
     return null
   }
@@ -63,7 +63,7 @@ const PersonForm = ({ addPerson }) => {
   )
 }
 
-const Person = ({ person, handleDelete}) => {
+const Person = ({ person, handleDelete }) => {
   return (
     <>
       {person.name} {person.number}
@@ -79,7 +79,7 @@ const PersonList = ({ persons, filter, deletePerson }) => {
     <div>
       {persons.filter((person) => filter.trim().length === 0 || person.name.toLowerCase().includes(filter.toLowerCase()))
         .map((person) =>
-          <Person key={person.id} person={person} handleDelete={()=>deletePerson(person.id)} />
+          <Person key={person.id} person={person} handleDelete={() => deletePerson(person.id)} />
         )}
     </div>
   )
@@ -92,7 +92,7 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  const personHook = ()=>{
+  const personHook = () => {
     console.log('get persons');
     personService
       .getAll()
@@ -101,35 +101,35 @@ const App = () => {
         setPersons(persons);
       })
   }
-  useEffect(personHook,[]);
+  useEffect(personHook, []);
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
   };
 
-  const showError = (errorText)=>{
+  const showError = (errorText) => {
     console.log(errorText);
     setErrorMessage(errorText);
-    setTimeout(()=>{
+    setTimeout(() => {
       setErrorMessage(null)
     }, notificationTime);
   }
-  const showSuccess = (text)=>{
+  const showSuccess = (text) => {
     console.log(text);
     setSuccessMessage(text);
-    setTimeout(()=>{
+    setTimeout(() => {
       setSuccessMessage(null)
     }, notificationTime);
   }
 
-  const deletePerson = (id)=>{
+  const deletePerson = (id) => {
     console.log('delete person');
-    const person = persons.find((p)=>p.id===id);
-    if(window.confirm(`Delete person ${person.name}?`)) {
+    const person = persons.find((p) => p.id === id);
+    if (window.confirm(`Delete person ${person.name}?`)) {
       personService.deleteRes(id)
-        .then(()=>{
+        .then(() => {
           console.log(`person ${id} deleted`);
-          setPersons(persons.filter((p)=>p.id!==id));
+          setPersons(persons.filter((p) => p.id !== id));
           showSuccess(`Removed ${person.name}`);
         })
     }
@@ -138,17 +138,23 @@ const App = () => {
   const addPerson = (newName, newNumber) => {
     const existingPerson = persons.find((person) => person.name === newName)
     if (existingPerson !== undefined) {
-      if(window.confirm(`${newName} has already been added to the phonebook, replace the old number with a new one?`)){
-        personService.update(existingPerson.id,{...existingPerson,name:newName,number:newNumber})
-        .then(updatedPerson =>{
-          console.log('person updated');
-          setPersons(persons.map((p)=>p.id!==updatedPerson.id?p:updatedPerson));
-          showSuccess(`updated phone number of ${updatedPerson.name} to ${updatedPerson.number}`);
-        })
-        .catch((error)=>{
-          showError(`the person ${existingPerson.name} has already been removed from the server`);
-          setPersons(persons.filter((p)=>p.id!==existingPerson.id));
-        })
+      if (window.confirm(`${newName} has already been added to the phonebook, replace the old number with a new one?`)) {
+        personService.update(existingPerson.id, { ...existingPerson, name: newName, number: newNumber })
+          .then(updatedPerson => {
+            console.log('person updated');
+            setPersons(persons.map((p) => p.id !== updatedPerson.id ? p : updatedPerson));
+            showSuccess(`updated phone number of ${updatedPerson.name} to ${updatedPerson.number}`);
+          })
+          .catch((error) => {
+            console.log("error during phone number update", error);
+            if (error.response.status===404) {
+              showError(`the person ${existingPerson.name} has already been removed from the server`);
+              setPersons(persons.filter((p) => p.id !== existingPerson.id));
+            }
+            else {
+              showError(error.response.data.error);
+            }
+          })
         return true;
       }
       return false;
@@ -158,7 +164,7 @@ const App = () => {
       name: newName,
       number: newNumber
     };
-    console.log('create person ',newPerson);
+    console.log('create person ', newPerson);
     personService
       .create(newPerson)
       .then(createdPerson => {
@@ -166,7 +172,7 @@ const App = () => {
         setPersons(persons.concat(createdPerson));
         showSuccess(`Added ${createdPerson.name}`);
       })
-      .catch(error=>{
+      .catch(error => {
         showError(error.response.data.error);
       })
     return true;
@@ -175,15 +181,15 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} typeClass="error"/>
-      <Notification message={successMessage} typeClass="success"/>
+      <Notification message={errorMessage} typeClass="error" />
+      <Notification message={successMessage} typeClass="success" />
       <Filter filter={filter} onChange={handleFilterChange} />
 
       <h3>Add a new Person</h3>
       <PersonForm addPerson={addPerson} />
 
       <h3>Numbers</h3>
-      <PersonList filter={filter} persons={persons}  deletePerson={deletePerson}/>
+      <PersonList filter={filter} persons={persons} deletePerson={deletePerson} />
     </div>
   )
 }
